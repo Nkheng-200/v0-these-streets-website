@@ -1,5 +1,8 @@
 "use client"
 
+import type React from "react"
+
+import { useState } from "react"
 import { X, Star, MapPin, Languages, MessageSquare } from "lucide-react"
 
 interface TourmanProfileProps {
@@ -18,13 +21,17 @@ interface TourmanProfileProps {
     favoriteSpots: Array<{ name: string; district: string }>
   }
   onClose: () => void
+  onBook: (tourman: TourmanProfileProps["tourman"], e: React.MouseEvent) => void
 }
 
-export function TourmanProfile({ tourman, onClose }: TourmanProfileProps) {
+export function TourmanProfile({ tourman, onClose, onBook }: TourmanProfileProps) {
+  const [showChat, setShowChat] = useState(false)
+  const [message, setMessage] = useState("")
+
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center" onClick={onClose}>
       <div
-        className="bg-card w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-card w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -48,10 +55,18 @@ export function TourmanProfile({ tourman, onClose }: TourmanProfileProps) {
               className="w-24 h-24 rounded-full border-4 border-card object-cover shadow-lg"
             />
           </div>
+          {/* Chat Now button moved lower */}
+          <button
+            onClick={(e) => onBook(tourman, e)}
+            className="absolute -bottom-12 right-6 bg-primary text-primary-foreground px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-all shadow-lg flex items-center gap-2"
+          >
+            <MessageSquare size={18} />
+            Chat Now
+          </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 pt-12 space-y-6">
+        <div className="p-6 pt-14 space-y-6">
           {/* Name & Rating */}
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-2">{tourman.name}</h2>
@@ -156,16 +171,6 @@ export function TourmanProfile({ tourman, onClose }: TourmanProfileProps) {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-border">
-            <button className="flex-1 bg-primary text-primary-foreground font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-              Book a Tour
-            </button>
-            <button className="p-3 bg-muted text-muted-foreground hover:bg-muted/80 rounded-lg transition-colors">
-              <MessageSquare size={20} />
-            </button>
           </div>
         </div>
       </div>

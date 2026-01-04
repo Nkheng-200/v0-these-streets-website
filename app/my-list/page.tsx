@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer"
 import { MyListView } from "@/components/mylist/my-list-view"
 import { MapView } from "@/components/mylist/map-view"
 import { BookshelfView, type Trip } from "@/components/mylist/bookshelf-view"
+import { CreateTripForm } from "@/components/mylist/create-trip-form"
 import { MapPin, List, ArrowLeft } from "lucide-react"
 
 // Mock Data for Multiple Trips
@@ -423,11 +424,10 @@ const mockTrips: Trip[] = [
 export default function MyListPage() {
   const [viewMode, setViewMode] = useState<"bookshelf" | "trip">("bookshelf")
   const [currentTrip, setCurrentTrip] = useState<Trip | null>(null)
-
-  // Trip View States
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [trips, setTrips] = useState<Trip[]>(mockTrips)
   const [listView, setListView] = useState<"list" | "map">("list")
   const [sortBy, setSortBy] = useState<"distance" | "cuisine" | "price" | "rating">("distance")
-  const [dishes, setDishes] = useState<any[]>([])
 
   const handleSelectTrip = (trip: Trip) => {
     setCurrentTrip(trip)
@@ -440,6 +440,17 @@ export default function MyListPage() {
     setCurrentTrip(null)
   }
 
+  const handleCreateTrip = (newTrip: { title: string; location: string; date: string; coverImage: string }) => {
+    const trip: Trip = {
+      id: trips.length + 1,
+      ...newTrip,
+      coverImage: newTrip.coverImage || "/placeholder.svg",
+      itemCount: 0,
+      dishes: [],
+    }
+    setTrips([...trips, trip])
+  }
+
   const handleMarkTried = (id: number) => {
     setDishes(dishes.map((d) => (d.id === id ? { ...d, tried: true } : d)))
   }
@@ -447,6 +458,16 @@ export default function MyListPage() {
   const handleRemove = (id: number) => {
     setDishes(dishes.filter((d) => d.id !== id))
   }
+
+  const handleDeleteTrip = (tripId: number) => {
+    setTrips(trips.filter((t) => t.id !== tripId))
+    // If currently viewing the deleted trip, go back to bookshelf
+    if (currentTrip?.id === tripId) {
+      handleBackToShelf()
+    }
+  }
+
+  const [dishes, setDishes] = useState<any[]>([])
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -527,9 +548,10 @@ export default function MyListPage() {
         {viewMode === "bookshelf" ? (
           <div className="animate-in fade-in duration-500">
             <BookshelfView
-              trips={mockTrips}
+              trips={trips}
               onSelectTrip={handleSelectTrip}
-              onAddTrip={() => console.log("Add Trip")}
+              onAddTrip={() => setShowCreateForm(true)}
+              onDeleteTrip={handleDeleteTrip}
             />
           </div>
         ) : (
@@ -544,6 +566,9 @@ export default function MyListPage() {
       </section>
 
       <Footer />
+
+      {/* CreateTripForm modal */}
+      {showCreateForm && <CreateTripForm onClose={() => setShowCreateForm(false)} onSave={handleCreateTrip} />}
     </div>
   )
 }

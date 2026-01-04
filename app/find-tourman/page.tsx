@@ -376,6 +376,16 @@ export default function FindTourmanPage() {
     setChatTourman(tourman)
   }
 
+  const handleBookNow = (tourman: (typeof mockTourmans)[0], e: React.MouseEvent) => {
+    e.stopPropagation()
+    const params = new URLSearchParams({
+      name: tourman.name,
+      price: tourman.price.toString(),
+      rating: tourman.rating.toString(),
+    })
+    window.location.href = `/transaction?${params.toString()}`
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
@@ -549,7 +559,7 @@ export default function FindTourmanPage() {
                         <p className="font-bold text-primary text-lg mr-auto">{tourman.price}</p>
 
                         <button
-                          onClick={(e) => handleOpenChat(tourman, e)}
+                          onClick={(e) => handleBookNow(tourman, e)}
                           className="bg-emerald-600 text-white hover:bg-emerald-700 font-semibold py-1.5 px-4 rounded-lg transition-colors text-sm"
                         >
                           Book Now

@@ -1,10 +1,18 @@
+import Image from "next/image"
+
 export function Footer() {
   return (
     <footer className="bg-card border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="font-bold text-foreground mb-4">These Streets</h3>
+            <Image
+              src="/logo.png"
+              alt="These Streets Logo"
+              width={180}
+              height={65}
+              className="h-14 w-auto object-contain mix-blend-multiply mb-4"
+            />
             <p className="text-muted-foreground text-sm">Eat like a local. Not like a tourist.</p>
           </div>
           <div>

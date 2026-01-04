@@ -1,239 +1,414 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import Link from "next/link"
-import { TouristIcon } from "@/components/icons/tourist-icon"
-import { GuideIcon } from "@/components/icons/guide-icon"
-import { RestaurantIcon } from "@/components/icons/restaurant-icon"
+import { ArrowRight, Heart, MapPin, Users, Star, ChevronDown, Smartphone, List, UserCheck } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import Image from "next/image"
+
+const AnimatedCountry = () => {
+  const countries = ["Vietnam", "Thailand", "Japan", "Korea", "Taiwan", "Singapore"]
+  const [index, setIndex] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true)
+      setTimeout(() => {
+        setIndex((prev) => (prev + 1) % countries.length)
+        setIsAnimating(false)
+      }, 500)
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <span
+      className={`inline-block text-accent transition-all duration-500 ${
+        isAnimating ? "opacity-0 -translate-y-4" : "opacity-100 translate-y-0"
+      }`}
+    >
+      {countries[index]}
+    </span>
+  )
+}
 
 export default function Home() {
+  const scrollToFeatures = () => {
+    document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="bg-primary text-primary-foreground px-4 sm:px-6 lg:px-8 py-16 sm:py-24 street-texture">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 leading-tight text-balance">
-            Eat Like a Local. Not Like a Tourist.
+      {/* Hero Section - Full viewport with striking visual */}
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-secondary">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('/vietnamese-street-food-pattern.jpg')] bg-repeat opacity-20" />
+        </div>
+
+        {/* Animated floating elements */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-accent/20 rounded-full blur-2xl animate-pulse" />
+        <div className="absolute bottom-40 right-20 w-32 h-32 bg-secondary/20 rounded-full blur-3xl animate-pulse delay-700" />
+        <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-accent/10 rounded-full blur-2xl animate-pulse delay-1000" />
+
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Main Headline */}
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-primary-foreground mb-6 leading-tight text-balance animate-fade-in">
+            Discover the Real
+            <br />
+            <span className="inline-block">
+              Streets of <AnimatedCountry />
+            </span>
           </h1>
-          <p className="text-lg sm:text-xl mb-8 opacity-95 text-balance">
-            Real food from real locals. No ads, no sponsored reviews, no tourist traps.
+
+          {/* Subheadline */}
+          <p className="text-xl sm:text-2xl text-primary-foreground/90 mb-12 max-w-3xl mx-auto text-balance animate-fade-in-up">
+            Skip the tourist traps. Find authentic street food through local guides who know every hidden gem.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-primary-foreground text-primary font-semibold px-8 py-3 rounded-lg hover:opacity-90 transition-opacity">
-              Download App
-            </button>
-            <Link
-              href="/tourmen"
-              className="bg-secondary text-secondary-foreground font-semibold px-8 py-3 rounded-lg hover:opacity-90 transition-opacity"
-            >
-              Become a Tourman
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-up">
+            <Link href="/swipe">
+              <Button size="lg" className="text-lg px-8 py-6 bg-accent text-accent-foreground hover:bg-accent/90 group">
+                Start Discovering
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </Link>
-            <Link
-              href="/restaurants"
-              className="border-2 border-primary-foreground text-primary-foreground font-semibold px-8 py-3 rounded-lg hover:bg-primary-foreground hover:text-primary transition-colors"
-            >
-              Add Your Restaurant
+            <Link href="/find-tourman">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-8 py-6 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary bg-transparent"
+              >
+                Find a Local Guide
+              </Button>
             </Link>
           </div>
+
+          {/* Social Proof */}
+          <div className="flex flex-wrap justify-center gap-8 text-primary-foreground/80 animate-fade-in-up">
+            <div className="flex items-center gap-2">
+              <Star className="h-5 w-5 fill-accent text-accent" />
+              <span className="text-sm">Rated 4.9/5 by travelers</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              <span className="text-sm">50+ Local Guides</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Heart className="h-5 w-5" />
+              <span className="text-sm">500+ Hidden Gems</span>
+            </div>
+          </div>
         </div>
+
+        {/* Scroll indicator */}
+        <button
+          onClick={scrollToFeatures}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-primary-foreground/60 hover:text-primary-foreground transition-colors animate-bounce"
+          aria-label="Scroll to features"
+        >
+          <ChevronDown className="h-8 w-8" />
+        </button>
       </section>
 
-      {/* Three Pillars */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
+      {/* How It Works - Visual Journey */}
+      <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-foreground">
-            One Platform. Three Communities.
-          </h2>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">Your Journey Starts Here</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              From discovery to dining, we make authentic food experiences effortless
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Tourists */}
-            <div className="bg-gradient-to-br from-card to-muted/40 border-2 border-primary/30 rounded-2xl p-8 hover:shadow-xl hover:border-primary/60 transition-all duration-300 group">
-              <div className="relative mb-6">
-                <div className="absolute inset-0 bg-primary/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-                <div className="relative w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center text-primary-foreground shadow-lg">
-                  <TouristIcon />
+            {/* Step 1: Swipe */}
+            <div className="relative group h-full">
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity" />
+              <div className="relative bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all h-full flex flex-col">
+                <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Smartphone className="w-8 h-8 text-primary" strokeWidth={2} />
                 </div>
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                For Tourists
-              </h3>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                Discover authentic hidden gems through GPS-based recommendations and real local reviews. Swipe, save,
-                and experience genuine food culture.
-              </p>
-              <Link
-                href="/tourists"
-                className="text-primary font-semibold hover:text-primary/80 transition-colors mb-4 block group-hover:translate-x-1 transition-transform"
-              >
-                Learn more →
-              </Link>
-              <div className="space-y-2 pt-4 border-t border-border/50">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
+                    1
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground">Swipe & Discover</h3>
+                </div>
+                <p className="text-base text-muted-foreground leading-relaxed mb-6 flex-grow">
+                  Browse authentic street food near you. Swipe right to save dishes that catch your eye, left to pass.
+                </p>
                 <Link
                   href="/swipe"
-                  className="text-sm text-secondary hover:text-secondary/80 transition-colors block hover:translate-x-1 transition-transform"
+                  className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors group/link"
                 >
-                  Try The Swipe →
+                  Try the swipe{" "}
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
                 </Link>
+              </div>
+            </div>
+
+            {/* Step 2: Build Your List */}
+            <div className="relative group h-full">
+              <div className="absolute -inset-1 bg-gradient-to-r from-secondary to-primary rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity" />
+              <div className="relative bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all h-full flex flex-col">
+                <div className="w-16 h-16 bg-secondary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <List className="w-8 h-8 text-secondary" strokeWidth={2} />
+                </div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center font-bold text-lg">
+                    2
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground">Build Your List</h3>
+                </div>
+                <p className="text-base text-muted-foreground leading-relaxed mb-6 flex-grow">
+                  Create personalized food trip playlists. Organize dishes by neighborhood or cuisine type.
+                </p>
                 <Link
                   href="/my-list"
-                  className="text-sm text-secondary hover:text-secondary/80 transition-colors block hover:translate-x-1 transition-transform"
+                  className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors group/link"
                 >
-                  Build My List →
+                  View my list{" "}
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
                 </Link>
               </div>
             </div>
 
-            {/* Tourmen */}
-            <div className="bg-gradient-to-br from-card to-muted/40 border-2 border-secondary/30 rounded-2xl p-8 hover:shadow-xl hover:border-secondary/60 transition-all duration-300 group">
-              <div className="relative mb-6">
-                <div className="absolute inset-0 bg-secondary/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-                <div className="relative w-16 h-16 bg-gradient-to-br from-secondary to-secondary/80 rounded-xl flex items-center justify-center text-secondary-foreground shadow-lg">
-                  <GuideIcon />
+            {/* Step 3: Book a Guide */}
+            <div className="relative group h-full">
+              <div className="absolute -inset-1 bg-gradient-to-r from-accent to-secondary rounded-2xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity" />
+              <div className="relative bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all h-full flex flex-col">
+                <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <UserCheck className="w-8 h-8 text-accent" strokeWidth={2} />
                 </div>
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-secondary transition-colors">
-                For Guides
-              </h3>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                Share your passion for local food and earn 80% revenue. Build your personal brand and lead tourists to
-                real hidden gems.
-              </p>
-              <Link
-                href="/tourmen"
-                className="text-primary font-semibold hover:text-primary/80 transition-colors mb-4 block group-hover:translate-x-1 transition-transform"
-              >
-                Learn more →
-              </Link>
-              <div className="pt-4 border-t border-border/50">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center font-bold text-lg">
+                    3
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground">Meet Your Guide</h3>
+                </div>
+                <p className="text-base text-muted-foreground leading-relaxed mb-6 flex-grow">
+                  Book a local Tourman who knows the stories behind every dish and every street corner.
+                </p>
                 <Link
                   href="/find-tourman"
-                  className="text-sm text-secondary hover:text-secondary/80 transition-colors block hover:translate-x-1 transition-transform"
+                  className="inline-flex items-center text-primary font-semibold hover:text-primary/80 transition-colors group/link"
                 >
-                  Find a Tourman →
+                  Find a guide{" "}
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Experiences - Visual Grid */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">Experience the Real Vietnam</h2>
+            <p className="text-xl text-muted-foreground">Authentic moments curated by locals</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Experience Card 1 */}
+            <Link
+              href="/swipe"
+              className="group relative overflow-hidden rounded-2xl aspect-[4/5] bg-gradient-to-br from-primary to-primary/80"
+            >
+              <Image
+                src="/vietnamese-street-food-vendor.jpg"
+                alt="Street Food"
+                fill
+                className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <h3 className="text-2xl font-bold mb-2">Hidden Street Stalls</h3>
+                <p className="text-white/80 mb-4">Where locals eat daily</p>
+                <div className="flex items-center text-accent font-semibold group-hover:translate-x-2 transition-transform">
+                  Explore now <ArrowRight className="ml-2 h-5 w-5" />
+                </div>
+              </div>
+            </Link>
+
+            {/* Experience Card 2 */}
+            <Link
+              href="/find-tourman"
+              className="group relative overflow-hidden rounded-2xl aspect-[4/5] bg-gradient-to-br from-secondary to-secondary/80"
+            >
+              <Image
+                src="/vietnamese-local-tour-guide.jpg"
+                alt="Local Guides"
+                fill
+                className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <h3 className="text-2xl font-bold mb-2">Expert Local Guides</h3>
+                <p className="text-white/80 mb-4">Stories beyond the menu</p>
+                <div className="flex items-center text-accent font-semibold group-hover:translate-x-2 transition-transform">
+                  Meet guides <ArrowRight className="ml-2 h-5 w-5" />
+                </div>
+              </div>
+            </Link>
+
+            {/* Experience Card 3 */}
+            <Link
+              href="/swipe"
+              className="group relative overflow-hidden rounded-2xl aspect-[4/5] bg-gradient-to-br from-accent to-accent/80"
+            >
+              <Image
+                src="/vietnamese-pho-bowl.jpg"
+                alt="Signature Dishes"
+                fill
+                className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <h3 className="text-2xl font-bold mb-2">Signature Dishes</h3>
+                <p className="text-white/80 mb-4">Each with its own story</p>
+                <div className="flex items-center text-accent font-semibold group-hover:translate-x-2 transition-transform">
+                  Start swiping <ArrowRight className="ml-2 h-5 w-5" />
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* For Different Users - Split Screen */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-muted/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* For Tourists */}
+            <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-12 text-primary-foreground relative overflow-hidden group hover:shadow-2xl transition-all">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
+              <div className="relative z-10">
+                <MapPin className="h-12 w-12 mb-6 text-accent" />
+                <h3 className="text-3xl font-bold mb-4">For Travelers</h3>
+                <p className="text-lg text-primary-foreground/90 mb-8 leading-relaxed">
+                  Discover authentic food experiences away from tourist crowds. GPS-powered recommendations guide you to
+                  hidden gems locals love.
+                </p>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-accent text-xs">✓</span>
+                    </div>
+                    <span>Swipe-based food discovery</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-accent text-xs">✓</span>
+                    </div>
+                    <span>Create custom food trip playlists</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-accent text-xs">✓</span>
+                    </div>
+                    <span>Book verified local guides</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-accent text-xs">✓</span>
+                    </div>
+                    <span>Read authentic reviews from locals</span>
+                  </li>
+                </ul>
+                <Link href="/tourists">
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 group">
+                    Start Your Journey
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
                 </Link>
               </div>
             </div>
 
-            {/* Restaurants */}
-            <div className="bg-gradient-to-br from-card to-muted/40 border-2 border-accent/30 rounded-2xl p-8 hover:shadow-xl hover:border-accent/60 transition-all duration-300 group">
-              <div className="relative mb-6">
-                <div className="absolute inset-0 bg-accent/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-                <div className="relative w-16 h-16 bg-gradient-to-br from-accent to-accent/80 rounded-xl flex items-center justify-center text-accent-foreground shadow-lg">
-                  <RestaurantIcon />
-                </div>
+            {/* For Guides */}
+            <div className="bg-gradient-to-br from-secondary to-secondary/80 rounded-3xl p-12 text-secondary-foreground relative overflow-hidden group hover:shadow-2xl transition-all">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
+              <div className="relative z-10">
+                <Users className="h-12 w-12 mb-6 text-accent" />
+                <h3 className="text-3xl font-bold mb-4">For Local Guides</h3>
+                <p className="text-lg text-secondary-foreground/90 mb-8 leading-relaxed">
+                  Turn your passion for local food into income. Share your neighborhood's hidden gems and earn 80% of
+                  tour revenue.
+                </p>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-accent text-xs">✓</span>
+                    </div>
+                    <span>Build your personal brand</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-accent text-xs">✓</span>
+                    </div>
+                    <span>Set your own schedule and rates</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-accent text-xs">✓</span>
+                    </div>
+                    <span>Connect with food-loving travelers</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-accent text-xs">✓</span>
+                    </div>
+                    <span>Grow your community reputation</span>
+                  </li>
+                </ul>
+                <Link href="/tourmen">
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 group">
+                    Become a Tourman
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-accent transition-colors">
-                For Restaurants
-              </h3>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
-                Highlight your signature dish and connect with the right customers. Respect mode protects your
-                authenticity and capacity.
-              </p>
-              <Link
-                href="/restaurants"
-                className="text-primary font-semibold hover:text-primary/80 transition-colors group-hover:translate-x-1 transition-transform inline-block"
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA - Bold and Simple */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary via-primary to-secondary relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('/street-pattern.jpg')] bg-repeat opacity-20" />
+        </div>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h2 className="text-4xl sm:text-5xl font-bold text-primary-foreground mb-6 text-balance">
+            Ready to Taste the Real Vietnam?
+          </h2>
+          <p className="text-xl text-primary-foreground/90 mb-10 text-balance">
+            Join thousands of travelers discovering authentic street food experiences
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/auth">
+              <Button size="lg" className="text-lg px-10 py-6 bg-accent text-accent-foreground hover:bg-accent/90">
+                Sign Up Free
+              </Button>
+            </Link>
+            <Link href="/swipe">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-10 py-6 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary bg-transparent"
               >
-                Learn more →
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="bg-muted py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-foreground">How the App Works</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="bg-primary text-primary-foreground w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">
-                1
-              </div>
-              <h4 className="font-semibold text-foreground mb-2">Find Your Location</h4>
-              <p className="text-sm text-muted-foreground">Allow GPS access to discover dishes near you</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-primary text-primary-foreground w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">
-                2
-              </div>
-              <h4 className="font-semibold text-foreground mb-2">Swipe & Discover</h4>
-              <p className="text-sm text-muted-foreground">Swipe right to save, left to skip recommended dishes</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-primary text-primary-foreground w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">
-                3
-              </div>
-              <h4 className="font-semibold text-foreground mb-2">Read Reviews</h4>
-              <p className="text-sm text-muted-foreground">See verified local reviews and upvoted recommendations</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-primary text-primary-foreground w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">
-                4
-              </div>
-              <h4 className="font-semibold text-foreground mb-2">Meet a Guide</h4>
-              <p className="text-sm text-muted-foreground">Book a Tourman for a personalized food experience</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Join */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-foreground">Why These Streets?</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="flex gap-4">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary text-primary-foreground">
-                  ✓
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Verified Locals Only</h3>
-                <p className="text-muted-foreground">No influencers, no fake reviews. Real people, real food.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary text-primary-foreground">
-                  ✓
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">GPS-Based Discovery</h3>
-                <p className="text-muted-foreground">Find authentic dishes exactly where you are.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary text-primary-foreground">
-                  ✓
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Support Small Businesses</h3>
-                <p className="text-muted-foreground">Help hidden gems thrive with the right customers.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary text-primary-foreground">
-                  ✓
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Earn as a Guide</h3>
-                <p className="text-muted-foreground">Share your passion and earn 80% of tour revenue.</p>
-              </div>
-            </div>
+                Start Exploring
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

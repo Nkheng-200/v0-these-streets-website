@@ -146,4 +146,33 @@
         rgba(0, 0, 0, 0.03) 4px
       ), repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.02) 2px, rgba(0, 0, 0, 0.02) 4px);
   }
+
+  /* Marquee animations for scrolling text */
+  .animate-marquee {
+    animation: marquee 40s linear infinite;
+  }
+
+  /* Added reverse marquee for opposite direction scrolling */
+  .animate-marquee-reverse {
+    animation: marquee-reverse 40s linear infinite;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes marquee-reverse {
+    0% {
+      transform: translateX(-50%);
+    }
+    100% {
+      transform: translateX(0%);
+    }
+  }
+  /* </CHANGE> */
 }

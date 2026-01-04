@@ -1,10 +1,492 @@
 "use client"
 
+import type React from "react"
+import { useState } from "react"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
-import { Briefcase, TrendingUp, Award, MapPin } from "lucide-react"
+import { Briefcase, TrendingUp, Award, MapPin, ArrowLeft, Upload, Check } from "lucide-react"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 
 export default function TourmenPage() {
+  const [showApplicationForm, setShowApplicationForm] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadedPhoto, setUploadedPhoto] = useState<string | null>("/placeholder.svg?height=200&width=200")
+  const [uploadedId, setUploadedId] = useState<string | null>("passport-scan.pdf")
+
+  const { upgradeToGuide } = useAuth()
+  const router = useRouter()
+
+  const [formData, setFormData] = useState({
+    fullName: "Minh Nguyen",
+    email: "minh.nguyen@example.com",
+    phone: "+84 912 345 678",
+    dateOfBirth: "1990-03-15",
+    nationality: "Vietnamese",
+    currentLocation: "Hanoi, Vietnam",
+    yearsOfExperience: "3-5",
+    languages: "Vietnamese, English, French",
+    specialties: ["Street Food", "Hidden Gems", "Local History"] as string[],
+    aboutYou:
+      "I was born and raised in Hanoi's Old Quarter, where I've spent over 10 years exploring every hidden alley and secret food stall. My grandmother was a street food vendor, and she taught me the stories behind every dish. I'm passionate about preserving our culinary heritage and sharing authentic experiences with visitors.",
+    whyGuide:
+      "Food is the soul of Vietnamese culture, and I believe every dish tells a story. I want to be a guide because I love connecting people to the real Hanoi - not the tourist traps, but the places where locals eat and gather. Seeing visitors' faces light up when they taste authentic phở or discover a hidden bánh mì stand brings me incredible joy.",
+    availability: "flexible",
+    maxGroupSize: "4",
+    hourlyRate: "25",
+  })
+
+  const specialtyOptions = [
+    "Street Food",
+    "Fine Dining",
+    "Hidden Gems",
+    "Local Markets",
+    "Cultural History",
+    "Vegetarian/Vegan",
+    "Night Food Tours",
+    "Coffee Culture",
+  ]
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  const handleSpecialtyToggle = (specialty: string) => {
+    if (formData.specialties.includes(specialty)) {
+      setFormData({
+        ...formData,
+        specialties: formData.specialties.filter((s) => s !== specialty),
+      })
+    } else {
+      setFormData({
+        ...formData,
+        specialties: [...formData.specialties, specialty],
+      })
+    }
+  }
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setUploadedPhoto(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleIdUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setUploadedId(file.name)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    setTimeout(() => {
+      setIsSubmitting(false)
+
+      upgradeToGuide({
+        specialties: formData.specialties,
+        languages: formData.languages.split(",").map((l) => l.trim()),
+        hourlyRate: formData.hourlyRate,
+        approved: false, // Pending admin approval
+      })
+
+      alert(
+        "Application submitted successfully! We'll review your application and get back to you within 2-3 business days. Check your dashboard for updates.",
+      )
+      setShowApplicationForm(false)
+      window.scrollTo({ top: 0, behavior: "smooth" })
+
+      router.push("/dashboard")
+    }, 2000)
+  }
+
+  if (showApplicationForm) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-orange-50 to-white">
+        <Navigation />
+
+        <main className="flex-1">
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+              <button
+                onClick={() => setShowApplicationForm(false)}
+                className="inline-flex items-center text-white/90 hover:text-white transition-colors mb-6"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Back to Guide Info
+              </button>
+              <h1 className="text-4xl font-bold mb-4">Become a Food Tour Guide</h1>
+              <p className="text-lg text-orange-100 max-w-2xl">
+                Join our community of passionate local guides and share your love for authentic street food with
+                travelers from around the world.
+              </p>
+            </div>
+          </div>
+
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Personal Information */}
+              <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Personal Information</h2>
+
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="fullName" className="block text-sm font-medium mb-2">
+                        Full Name *
+                      </label>
+                      <input
+                        id="fullName"
+                        name="fullName"
+                        required
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                        placeholder="Enter your full name"
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="your@email.com"
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                        Phone Number *
+                      </label>
+                      <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        required
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="+84 123 456 789"
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="dateOfBirth" className="block text-sm font-medium mb-2">
+                        Date of Birth *
+                      </label>
+                      <input
+                        id="dateOfBirth"
+                        name="dateOfBirth"
+                        type="date"
+                        required
+                        value={formData.dateOfBirth}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="nationality" className="block text-sm font-medium mb-2">
+                        Nationality *
+                      </label>
+                      <input
+                        id="nationality"
+                        name="nationality"
+                        required
+                        value={formData.nationality}
+                        onChange={handleInputChange}
+                        placeholder="Vietnamese"
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="currentLocation" className="block text-sm font-medium mb-2">
+                        Current Location *
+                      </label>
+                      <input
+                        id="currentLocation"
+                        name="currentLocation"
+                        required
+                        value={formData.currentLocation}
+                        onChange={handleInputChange}
+                        placeholder="Hanoi, Vietnam"
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Profile Photo *</label>
+                    <div className="mt-2 flex items-center gap-4">
+                      {uploadedPhoto && (
+                        <img
+                          src={uploadedPhoto || "/placeholder.svg"}
+                          alt="Profile preview"
+                          className="w-20 h-20 rounded-full object-cover"
+                        />
+                      )}
+                      <label className="cursor-pointer">
+                        <div className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-500 transition-colors">
+                          <Upload className="w-5 h-5 text-orange-600" />
+                          <span className="text-sm text-gray-600">
+                            {uploadedPhoto ? "Change Photo" : "Upload Photo"}
+                          </span>
+                        </div>
+                        <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      A clear, professional photo of yourself (JPG, PNG, max 5MB)
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">ID Document *</label>
+                    <div className="mt-2">
+                      <label className="cursor-pointer">
+                        <div className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-500 transition-colors">
+                          {uploadedId ? (
+                            <>
+                              <Check className="w-5 h-5 text-green-600" />
+                              <span className="text-sm text-gray-600">{uploadedId}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-5 h-5 text-orange-600" />
+                              <span className="text-sm text-gray-600">Upload ID/Passport</span>
+                            </>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          onChange={handleIdUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Government-issued ID or passport for verification (PDF or Image)
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Professional Experience */}
+              <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Professional Experience</h2>
+
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="yearsOfExperience" className="block text-sm font-medium mb-2">
+                        Years of Guiding Experience *
+                      </label>
+                      <select
+                        id="yearsOfExperience"
+                        name="yearsOfExperience"
+                        required
+                        value={formData.yearsOfExperience}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      >
+                        <option value="">Select experience</option>
+                        <option value="0-1">Less than 1 year</option>
+                        <option value="1-3">1-3 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="5+">5+ years</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label htmlFor="languages" className="block text-sm font-medium mb-2">
+                        Languages You Speak *
+                      </label>
+                      <input
+                        id="languages"
+                        name="languages"
+                        required
+                        value={formData.languages}
+                        onChange={handleInputChange}
+                        placeholder="e.g., Vietnamese, English, French"
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Your Specialties *</label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+                      {specialtyOptions.map((specialty) => (
+                        <button
+                          key={specialty}
+                          type="button"
+                          onClick={() => handleSpecialtyToggle(specialty)}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            formData.specialties.includes(specialty)
+                              ? "bg-orange-500 text-white"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          }`}
+                        >
+                          {specialty}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Select all that apply</p>
+                  </div>
+
+                  <div>
+                    <label htmlFor="aboutYou" className="block text-sm font-medium mb-2">
+                      Tell Us About Yourself *
+                    </label>
+                    <textarea
+                      id="aboutYou"
+                      name="aboutYou"
+                      required
+                      value={formData.aboutYou}
+                      onChange={handleInputChange}
+                      rows={4}
+                      placeholder="Share your background, experience with food culture, and what makes you unique..."
+                      className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="whyGuide" className="block text-sm font-medium mb-2">
+                      Why Do You Want to Be a Food Tour Guide? *
+                    </label>
+                    <textarea
+                      id="whyGuide"
+                      name="whyGuide"
+                      required
+                      value={formData.whyGuide}
+                      onChange={handleInputChange}
+                      rows={3}
+                      placeholder="What motivates you to share your local food culture with tourists?"
+                      className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Availability & Pricing */}
+              <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Availability & Pricing</h2>
+
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="availability" className="block text-sm font-medium mb-2">
+                      General Availability *
+                    </label>
+                    <select
+                      id="availability"
+                      name="availability"
+                      required
+                      value={formData.availability}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                    >
+                      <option value="">Select availability</option>
+                      <option value="weekdays">Weekdays only</option>
+                      <option value="weekends">Weekends only</option>
+                      <option value="flexible">Flexible (All days)</option>
+                      <option value="limited">Limited (Few days per month)</option>
+                    </select>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="maxGroupSize" className="block text-sm font-medium mb-2">
+                        Maximum Group Size *
+                      </label>
+                      <select
+                        id="maxGroupSize"
+                        name="maxGroupSize"
+                        required
+                        value={formData.maxGroupSize}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      >
+                        <option value="1">1 person</option>
+                        <option value="2">2 people</option>
+                        <option value="4">4 people</option>
+                        <option value="6">6 people</option>
+                        <option value="8">8+ people</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label htmlFor="hourlyRate" className="block text-sm font-medium mb-2">
+                        Desired Hourly Rate (USD) *
+                      </label>
+                      <input
+                        id="hourlyRate"
+                        name="hourlyRate"
+                        type="number"
+                        min="10"
+                        max="100"
+                        required
+                        value={formData.hourlyRate}
+                        onChange={handleInputChange}
+                        placeholder="20"
+                        className="w-full px-3 py-2 border border-input rounded-md bg-background"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Typical range: $15-$40/hour</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Terms & Submit */}
+              <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" required className="mt-1 rounded" />
+                  <span className="text-sm text-gray-700">
+                    I confirm that all information provided is accurate and I agree to the Terms of Service and Privacy
+                    Policy. I understand that background verification will be conducted.
+                  </span>
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? "Submitting Application..." : "Submit Application"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
@@ -156,7 +638,10 @@ export default function TourmenPage() {
           </div>
 
           <div className="text-center mt-12">
-            <button className="bg-primary-foreground text-primary font-semibold px-8 py-3 rounded-lg hover:opacity-90 transition-opacity">
+            <button
+              onClick={() => setShowApplicationForm(true)}
+              className="bg-primary-foreground text-primary font-semibold px-8 py-3 rounded-lg hover:opacity-90 transition-opacity"
+            >
               Apply to Become a Guide
             </button>
           </div>
